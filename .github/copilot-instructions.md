@@ -1,0 +1,3 @@
+- use primevue for common components
+- when using primevue icon with component like input use inputgroup and inputgroupaddon components
+- use prime icon
