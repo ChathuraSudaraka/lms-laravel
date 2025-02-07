@@ -72,15 +72,24 @@ const progressClass = computed(() => {
             <!-- Required Stars Progress -->
             <div class="mb-4">
                 <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-medium" :class="isUnlocked ? 'text-green-600' : 'text-gray-600'">
-                        <i class="pi mr-1" :class="isUnlocked ? 'pi-check-circle' : 'pi-lock'"></i>
-                        Required Stars: {{ product.requiredStars }}
-                    </span>
-                    <span class="text-xs text-gray-500">
-                        {{ Math.round(progressValue) }}%
-                    </span>
+                    <InputGroup>
+                        <InputGroupAddon>
+                            <i class="pi"
+                                :class="isUnlocked ? 'pi-check-circle text-green-500' : 'pi-lock text-gray-500'"></i>
+                        </InputGroupAddon>
+                        <span class="text-sm font-medium px-2" :class="isUnlocked ? 'text-green-600' : 'text-gray-600'">
+                            Required Stars: {{ product.requiredStars }}
+                        </span>
+                    </InputGroup>
+                    <Badge :value="`${Math.round(progressValue)}%`" :severity="progressClass" class="text-xs" />
                 </div>
-                <ProgressBar :value="progressValue" :class="progressClass" />
+                <ProgressBar :value="progressValue" :class="progressClass" :showValue="false" :pt="{
+                    root: { class: 'hover:shadow-md transition-shadow' }
+                }" />
+                <div class="flex justify-between mt-1 text-xs text-gray-500">
+                    <span>{{ product.stars }} earned</span>
+                    <span>{{ product.requiredStars }} needed</span>
+                </div>
             </div>
 
             <!-- Footer -->

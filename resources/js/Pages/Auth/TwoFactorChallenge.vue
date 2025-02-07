@@ -3,12 +3,11 @@ import { nextTick, ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AuthenticationCard from '@/Components/AuthenticationCard.vue';
 import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
+import Divider from 'primevue/divider';
 
 const recovery = ref(false);
 
@@ -47,7 +46,7 @@ const submit = () => {
             <AuthenticationCardLogo />
         </template>
 
-        <div class="mb-4 text-sm text-gray-600">
+        <div class="mb-6 text-sm text-gray-600">
             <template v-if="! recovery">
                 Please confirm access to your account by entering the authentication code provided by your authenticator application.
             </template>
@@ -57,12 +56,12 @@ const submit = () => {
             </template>
         </div>
 
-        <form @submit.prevent="submit">
-            <div v-if="! recovery">
-                <InputLabel for="code" value="Code" />
+        <form @submit.prevent="submit" class="space-y-4">
+            <div v-if="! recovery" class="space-y-2">
+                <label for="code" class="text-sm font-medium text-gray-700 block">Code</label>
                 <InputGroup>
                     <InputGroupAddon>
-                        <i class="pi pi-lock"></i>
+                        <i class="pi pi-lock text-gray-400"></i>
                     </InputGroupAddon>
                     <InputText
                         id="code"
@@ -71,18 +70,20 @@ const submit = () => {
                         type="text"
                         inputmode="numeric"
                         class="w-full"
+                        :class="{ 'p-invalid': form.errors.code }"
+                        placeholder="Enter authentication code"
                         autofocus
                         autocomplete="one-time-code"
                     />
                 </InputGroup>
-                <InputError class="mt-2" :message="form.errors.code" />
+                <small class="p-error" v-if="form.errors.code">{{ form.errors.code }}</small>
             </div>
 
-            <div v-else>
-                <InputLabel for="recovery_code" value="Recovery Code" />
+            <div v-else class="space-y-2">
+                <label for="recovery_code" class="text-sm font-medium text-gray-700 block">Recovery Code</label>
                 <InputGroup>
                     <InputGroupAddon>
-                        <i class="pi pi-shield"></i>
+                        <i class="pi pi-shield text-gray-400"></i>
                     </InputGroupAddon>
                     <InputText
                         id="recovery_code"
@@ -90,35 +91,42 @@ const submit = () => {
                         v-model="form.recovery_code"
                         type="text"
                         class="w-full"
+                        :class="{ 'p-invalid': form.errors.recovery_code }"
+                        placeholder="Enter recovery code"
                         autocomplete="one-time-code"
                     />
                 </InputGroup>
-                <InputError class="mt-2" :message="form.errors.recovery_code" />
+                <small class="p-error" v-if="form.errors.recovery_code">{{ form.errors.recovery_code }}</small>
             </div>
 
-            <div class="flex items-center justify-end mt-4">
-                <Button
-                    type="button"
-                    text
-                    @click.prevent="toggleRecovery"
-                >
-                    <template v-if="! recovery">
-                        Use a recovery code
-                    </template>
-                    <template v-else>
-                        Use an authentication code
-                    </template>
-                </Button>
+            <Button
+                type="submit"
+                :label="'Log in'"
+                :loading="form.processing"
+                class="w-full"
+            />
 
-                <Button
-                    type="submit"
-                    :loading="form.processing"
-                    :disabled="form.processing"
-                    class="ms-4"
-                >
-                    Log in
-                </Button>
-            </div>
+            <Divider align="center">
+                <span class="text-sm text-gray-500">Or</span>
+            </Divider>
+
+            <Button
+                type="button"
+                :label="recovery ? 'Use an authentication code' : 'Use a recovery code'"
+                text
+                class="w-full"
+                @click="toggleRecovery"
+            />
         </form>
     </AuthenticationCard>
 </template>
+
+<style scoped>
+:deep(.p-inputtext) {
+    border-radius: 0.375rem;
+}
+
+:deep(.p-inputgroup-addon) {
+    background-color: transparent;
+}
+</style>
