@@ -11,8 +11,7 @@
     <!-- Logo Section -->
     <div class="p-4 border-b border-gray-50 flex items-center justify-between">
       <div v-if="!sidebarStore.isCollapsed" class="flex items-center space-x-3">
-        <div
-          class="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
           <img src="/logo.png" alt="Logo" class="w-full h-full object-cover">
         </div>
         <h1 class="text-xl font-bold">
@@ -140,35 +139,23 @@ const mainMenuItems = [
     icon: 'pi-user-edit',
     route: route('console.moderators'),
   },
+]
+
+const managementItems = [
   {
     label: 'Lessons',
     icon: 'pi-book',
     route: route('console.lessons')
   },
   {
-    label: 'Reports',
-    icon: 'pi-file',
-    // route: route('console.reports')
-  }
-]
-
-const managementItems = [
-  {
-    label: 'Tools',
-    icon: 'pi-wrench',
-    // route: route('console.tools')
+    label: 'Quizzes',
+    icon: 'pi-check-square',
+    route: route('console.quizzes.index')
   },
   {
-    label: 'Messages',
-    icon: 'pi-envelope',
-    // route: route('console.messages'),
-    badge: '5',
-    badgeType: 'warning'
-  },
-  {
-    label: 'Settings',
-    icon: 'pi-cog',
-    // route: route('console.settings')
+    label: 'Products',
+    icon: 'pi-box',
+    route: route('console.products')
   }
 ]
 </script>

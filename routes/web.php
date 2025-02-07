@@ -11,7 +11,7 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('home');
 
 Route::middleware([
     'auth:sanctum',
@@ -30,4 +30,29 @@ Route::middleware([
     Route::get('/lessons', function () {
         return Inertia::render('Console/Lessons/Show');
     })->name('lessons');
+    Route::get('/quizzes', function () {
+        return Inertia::render('Console/Quizzes/Show');
+    })->name('quizzes');
+    Route::get('/products', function () {
+        return Inertia::render('Console/Products/Show');
+    })->name('products');
+
+    // Quiz Routes
+    Route::prefix('quizzes')->name('quizzes.')->group(function () {
+        Route::get('/', function () {
+            return Inertia::render('Console/Quizzes/Show');
+        })->name('index');
+        
+        Route::get('/new', function () {
+            return Inertia::render('Console/Quizzes/New');
+        })->name('new');
+        
+        Route::get('/{quiz}', function () {
+            return Inertia::render('Console/Quizzes/Single');
+        })->name('view');
+        
+        Route::get('/{quiz}/edit', function () {
+            return Inertia::render('Console/Quizzes/Edit');
+        })->name('edit');
+    });
 });

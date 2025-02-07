@@ -57,15 +57,22 @@
 
         <!-- User Profile -->
         <div class="flex items-center space-x-3">
-          <Avatar 
-            :image="userPhotoUrl" 
-            shape="circle" 
-            size="normal"
-            class="ring-2 ring-primary-100"
-          />
+          <Link :href="route('profile.show')">
+            <Avatar 
+              :image="userPhotoUrl" 
+              shape="circle" 
+              size="normal"
+              class="ring-2 ring-primary-100 cursor-pointer hover:ring-primary-200 transition-all"
+            />
+          </Link>
           <div class="hidden md:block">
-            <h3 class="text-sm font-medium text-gray-700">{{ userName }}</h3>
-            <p class="text-xs text-gray-500">{{ userRole }}</p>
+            <Link 
+              :href="route('profile.show')"
+              class="hover:text-primary-600 transition-colors"
+            >
+              <h3 class="text-sm font-medium text-gray-700">{{ userName }}</h3>
+              <p class="text-xs text-gray-500">{{ userRole }}</p>
+            </Link>
           </div>
           <Button 
             icon="pi pi-chevron-down"
@@ -105,7 +112,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { Link, router } from '@inertiajs/vue3';
 import InputText from 'primevue/inputtext'
 import InputGroup from 'primevue/inputgroup'
 import InputGroupAddon from 'primevue/inputgroupaddon'
@@ -142,36 +150,62 @@ const toggleMenu = (event) => {
   menu.value.toggle(event)
 }
 
+const handleLogout = () => {
+  router.post(route('logout'));
+};
+
 const menuItems = [
   {
     label: 'Profile',
     icon: 'pi pi-user',
-    command: () => { /* handle profile click */ }
+    command: () => router.get(route('profile.show'))
   },
   {
     label: 'Settings',
     icon: 'pi pi-cog',
-    command: () => { /* handle settings click */ }
+    command: () => router.get(route('console.settings'))
   },
   { separator: true },
   {
     label: 'Messages',
     icon: 'pi pi-envelope',
-    class: 'sm:hidden' // Only show on mobile
+    class: 'sm:hidden', // Only show on mobile
+    badge: '3',
+    badgeClass: 'bg-blue-500'
   },
   {
     label: 'Notifications',
     icon: 'pi pi-bell',
-    class: 'sm:hidden' // Only show on mobile
+    class: 'sm:hidden', // Only show on mobile
+    badge: '2',
+    badgeClass: 'bg-red-500'
   },
   { separator: true },
   {
     label: 'Sign Out',
     icon: 'pi pi-power-off',
     class: 'text-red-500',
-    command: () => { /* handle logout */ }
+    command: handleLogout
   }
-]
+];
+
+// Add keyboard shortcut for search
+const handleKeydown = (event) => {
+  if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+    event.preventDefault();
+    search.value = '';
+    showMobileSearch.value = true;
+  }
+};
+
+// Add event listener for keyboard shortcut
+onMounted(() => {
+  document.addEventListener('keydown', handleKeydown);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown);
+});
 </script>
 
 <style scoped>
@@ -191,5 +225,17 @@ const menuItems = [
 
 :deep(.p-menu .p-menuitem-link .p-menuitem-icon) {
   color: #9ca3af;
+}
+
+:deep(.p-menu .p-menuitem-link .p-menuitem-text) {
+  color: #374151;
+}
+
+:deep(.p-menu .p-menuitem-link:not(.p-disabled):hover .p-menuitem-text) {
+  color: var(--primary-600);
+}
+
+:deep(.p-menu .p-menuitem-link .p-badge) {
+  margin-left: auto;
 }
 </style>
