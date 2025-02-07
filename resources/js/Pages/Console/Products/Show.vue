@@ -24,6 +24,7 @@ const products = ref([
         description: 'A starter kit for young scientists',
         image: 'https://placehold.co/300x200?text=Science+Kit',
         stars: 100,
+        requiredStars: 50,
         createdAt: '2024-01-15'
     },
     {
@@ -32,6 +33,7 @@ const products = ref([
         description: 'Advanced math learning tools for students',
         image: 'https://placehold.co/300x200?text=Smart+Watch',
         stars: 85,
+        requiredStars: 75,
         createdAt: '2024-01-14'
     },
     {
