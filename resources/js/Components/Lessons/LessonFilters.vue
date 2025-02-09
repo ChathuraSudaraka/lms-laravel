@@ -1,10 +1,13 @@
 <script setup>
+import { computed } from 'vue';
 import InputText from "primevue/inputtext";
 import Dropdown from "primevue/dropdown";
 import MultiSelect from "primevue/multiselect";
 import Button from "primevue/button";
+import InputGroup from 'primevue/inputgroup';
+import InputGroupAddon from 'primevue/inputgroupaddon';
 
-defineProps({
+const props = defineProps({
     searchQuery: String,
     selectedGrade: String,
     selectedTags: Array,
@@ -14,53 +17,87 @@ defineProps({
     sortOptions: Array,
     hasActiveFilters: Boolean
 });
+const emit = defineEmits([
+    'update:searchQuery',
+    'update:selectedGrade',
+    'update:selectedTags',
+    'update:sortBy',
+    'reset'
+]);
 
-const emit = defineEmits(['update:searchQuery', 'update:selectedGrade', 'update:selectedTags', 'update:sortBy', 'reset']);
+// Create two-way bindings using computed getters/setters
+const vSearchQuery = computed({
+    get: () => props.searchQuery,
+    set: val => emit('update:searchQuery', val)
+});
+const vSelectedGrade = computed({
+    get: () => props.selectedGrade,
+    set: val => emit('update:selectedGrade', val)
+});
+const vSelectedTags = computed({
+    get: () => props.selectedTags,
+    set: val => emit('update:selectedTags', val)
+});
+const vSortBy = computed({
+    get: () => props.sortBy,
+    set: val => emit('update:sortBy', val)
+});
 </script>
 
 <template>
-    <div class="mb-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
-            <div class="col-span-1 sm:col-span-2">
+    <div class="flex flex-col gap-4 mb-6">
+        <div class="flex flex-col sm:flex-row gap-4">
+            <InputGroup class="flex-1">
+                <InputGroupAddon>
+                    <i class="pi pi-search" />
+                </InputGroupAddon>
+                <!-- Use v-model binding with computed property -->
                 <InputText
-                    :value="searchQuery"
-                    @input="$emit('update:searchQuery', $event.target.value)"
+                    v-model="vSearchQuery"
                     placeholder="Search lessons..."
                     class="w-full"
                 />
+            </InputGroup>
+            <div class="flex gap-4">
+                <Dropdown
+                    v-model="vSelectedGrade"
+                    :options="grades"
+                    placeholder="Select Grade"
+                    class="w-48"
+                />
+                <Dropdown
+                    v-model="vSortBy"
+                    :options="sortOptions"
+                    optionLabel="label"
+                    placeholder="Sort By"
+                    class="w-48"
+                />
             </div>
-            <Dropdown
-                :value="selectedGrade"
-                @update:modelValue="$emit('update:selectedGrade', $event)"
-                :options="grades"
-                placeholder="Select Grade"
-                class="w-full"
-            />
-            <Dropdown
-                :value="sortBy"
-                @update:modelValue="$emit('update:sortBy', $event)"
-                :options="sortOptions"
-                optionLabel="label"
-                placeholder="Sort By"
-                class="w-full"
-            />
         </div>
         <div class="flex items-center gap-3">
             <MultiSelect
-                :value="selectedTags"
-                @update:modelValue="$emit('update:selectedTags', $event)"
+                v-model="vSelectedTags"
                 :options="tags"
                 optionLabel="name"
                 placeholder="Select Tags"
                 class="flex-1"
             />
             <Button 
-                v-if="hasActiveFilters"
+                v-if="props.hasActiveFilters"
                 icon="pi pi-filter-slash"
-                @click="$emit('reset')"
+                severity="secondary"
                 text
-                size="small"
+                @click="$emit('reset')"
+                tooltip="Clear all filters"
             />
         </div>
     </div>
 </template>
+
+<style scoped>
+:deep(.p-dropdown),
+:deep(.p-multiselect),
+:deep(.p-inputtext) {
+    width: 100%;
+}
+</style>

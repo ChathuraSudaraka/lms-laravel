@@ -31,6 +31,21 @@ const availableTags = ref([
     { name: 'English', code: 'english' }
 ]);
 
+// New tag creation
+const newTag = ref('');
+const handleNewTag = () => {
+    const value = newTag.value.trim();
+    if (value) {
+        // Add tag if not exists (case insensitive)
+        if (!availableTags.value.find(tag => tag.name.toLowerCase() === value.toLowerCase())) {
+            const tag = { code: value.toLowerCase().replace(/\s+/g, '-'), name: value };
+            availableTags.value.push(tag);
+            lesson.value.tags.push(tag);
+        }
+        newTag.value = '';
+    }
+};
+
 const fetchYoutubeData = () => {
     loading.value = true;
     // Simulate API call
@@ -100,6 +115,17 @@ const createLesson = () => {
                     :filter="true"
                     class="w-full"
                 />
+                <InputGroup class="mt-2">
+                    <InputGroupAddon>
+                        <i class="pi pi-plus" />
+                    </InputGroupAddon>
+                    <InputText
+                        v-model="newTag"
+                        placeholder="Type tag then press Enter"
+                        @keydown.enter.prevent="handleNewTag"
+                        class="w-full"
+                    />
+                </InputGroup>
             </div>
         </div>
 

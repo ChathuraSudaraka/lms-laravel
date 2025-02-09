@@ -95,7 +95,7 @@ const onStudentChange = (updatedStudent) => {
 <template>
     <AppLayout>
         <div class="w-full p-5 md:p-8 bg-white rounded-lg mb-6">
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <Heading title="Students" description="Manage all students in the system" />
                 <Button label="Invite Student" icon="pi pi-user-plus" @click="inviteModal = true" />
             </div>

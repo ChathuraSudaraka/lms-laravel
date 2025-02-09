@@ -5,6 +5,8 @@ import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
 import Textarea from 'primevue/textarea';
 import Button from 'primevue/button';
+import FileUpload from 'primevue/fileupload';
+import Image from 'primevue/image';
 
 const props = defineProps({
     modelValue: Boolean  // renamed from visible to modelValue for v-model convention
@@ -16,22 +18,51 @@ const product = ref({
     name: '',
     stars: 0,
     description: '',
-    image: ''
+    image: null,
+    imagePreview: null
 });
+
+const onFileSelect = (event) => {
+    const file = event.files[0];
+    if (file) {
+        product.value.image = file;
+        // Create preview URL
+        product.value.imagePreview = URL.createObjectURL(file);
+    }
+};
+
+const onFileRemove = () => {
+    product.value.image = null;
+    product.value.imagePreview = null;
+};
 
 const closeModal = () => {
     emit('update:modelValue', false);
-};
-
-const saveProduct = () => {
-    emit('save', { ...product.value });
-    closeModal();
+    // Clean up preview URL
+    if (product.value.imagePreview) {
+        URL.revokeObjectURL(product.value.imagePreview);
+    }
     product.value = {
         name: '',
         stars: 0,
         description: '',
-        image: ''
+        image: null,
+        imagePreview: null
     };
+};
+
+const saveProduct = () => {
+    // Create FormData to handle file upload
+    const formData = new FormData();
+    formData.append('name', product.value.name);
+    formData.append('stars', product.value.stars);
+    formData.append('description', product.value.description);
+    if (product.value.image) {
+        formData.append('image', product.value.image);
+    }
+    
+    emit('save', formData);
+    closeModal();
 };
 </script>
 
@@ -55,8 +86,29 @@ const saveProduct = () => {
             </div>
 
             <div class="field">
-                <label for="image" class="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-                <InputText id="image" v-model="product.image" class="w-full" />
+                <label class="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
+                <FileUpload
+                    mode="basic"
+                    :auto="true"
+                    accept="image/*"
+                    :maxFileSize="1000000"
+                    @upload="onFileSelect"
+                    @remove="onFileRemove"
+                    :customUpload="true"
+                    chooseLabel="Choose Image"
+                />
+                <small class="text-gray-500">Max file size: 1MB</small>
+                
+                <div v-if="product.imagePreview" class="mt-3">
+                    <Image
+                        :src="product.imagePreview"
+                        alt="Product Preview"
+                        preview
+                        :pt="{
+                            image: { class: 'w-full max-h-[200px] object-cover rounded-lg' }
+                        }"
+                    />
+                </div>
             </div>
 
             <div class="field">
@@ -68,8 +120,21 @@ const saveProduct = () => {
         <template #footer>
             <div class="flex justify-end gap-2">
                 <Button label="Cancel" severity="secondary" @click="closeModal" />
-                <Button label="Save" @click="saveProduct" />
+                <Button 
+                    label="Save" 
+                    @click="saveProduct"
+                    :disabled="!product.name || !product.image"
+                />
             </div>
         </template>
     </Dialog>
 </template>
+
+<style scoped>
+:deep(.p-fileupload-basic) {
+    width: 100%;
+}
+:deep(.p-button.p-fileupload-choose) {
+    width: 100%;
+}
+</style>
