@@ -1,17 +1,20 @@
 import { ref, computed } from 'vue';
 
-export function useLessonFilters() {
+export function useLessonFilters(lessonsRef) {
     const searchQuery = ref('');
     const selectedGrade = ref(null);
     const selectedTags = ref([]);
     const sortBy = ref('newest');
 
     const grades = ref(['6', '7', '8', '9', '10', '11']);
-    const tags = ref([
-        { name: 'Mathematics', code: 'math' },
-        { name: 'Science', code: 'science' },
-        { name: 'English', code: 'english' }
-    ]);
+    const tags = computed(() => {
+        if (!lessonsRef?.value) return [];
+        const tagSet = new Set();
+        lessonsRef.value.forEach(lesson => {
+            lesson.tags.forEach(tag => tagSet.add(tag));
+        });
+        return Array.from(tagSet);
+    });
 
     const sortOptions = ref([
         { label: 'Newest First', value: 'newest' },
@@ -49,7 +52,7 @@ export function useLessonFilters() {
 
         if (selectedTags.value.length) {
             filtered = filtered.filter(lesson =>
-                lesson.tags.some(tag => selectedTags.value.find(t => t.code === tag.code))
+                lesson.tags.some(tag => selectedTags.value.includes(tag))
             );
         }
 

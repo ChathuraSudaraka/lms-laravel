@@ -11,84 +11,41 @@ import InputGroupAddon from 'primevue/inputgroupaddon';
 import { useToast } from "primevue/usetoast";
 import { getFileTypeIcon, getFileTypeColor } from '@/Utils/fileHelpers';
 
+const toast = useToast();
+
 const props = defineProps({
     visible: Boolean,
+    lesson: {
+        type: Object,
+        required: true,
+        default: () => ({
+            youtubeUrl: '',
+            title: '',
+            description: '',
+            grade: null,
+            tags: [],
+            resources: [] // Add resources to default lesson structure
+        })
+    },
     grades: Array,
+    tags: Array,
 });
 
 const emit = defineEmits(['update:visible', 'save']);
 
-const lesson = ref({
+const editedLesson = ref({
     youtubeUrl: '',
     title: '',
     description: '',
     grade: null,
     tags: [],
-    resources: [] // Now will store drive links
+    resources: []
 });
 
-const loading = ref(false);
-const availableTags = ref([
-    { name: 'Mathematics', code: 'math' },
-    { name: 'Science', code: 'science' },
-    { name: 'English', code: 'english' }
-]);
-
-// New tag creation
-const newTag = ref('');
-const handleNewTag = () => {
-    const value = newTag.value.trim();
-    if (value) {
-        // Add tag if not exists (case insensitive)
-        if (!availableTags.value.find(tag => tag.name.toLowerCase() === value.toLowerCase())) {
-            const tag = { code: value.toLowerCase().replace(/\s+/g, '-'), name: value };
-            availableTags.value.push(tag);
-            lesson.value.tags.push(tag);
-        }
-        newTag.value = '';
-    }
-};
-
-const fetchYoutubeData = () => {
-    loading.value = true;
-    // Simulate API call
-    setTimeout(() => {
-        lesson.value.title = 'Sample YouTube Video Title';
-        lesson.value.description = 'This is a sample description fetched from YouTube API';
-        loading.value = false;
-    }, 1000);
-};
-
-const createLesson = () => {
-    emit('save', lesson.value);
-    emit('update:visible', false);
-};
-
-const toast = useToast();
-
-const handleUploadSuccess = (message) => {
-    toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: message,
-        life: 3000
-    });
-};
-
-const handleUploadError = (error) => {
-    toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: error,
-        life: 3000
-    });
-};
-
-// New resource handling
 const newResource = ref({
     name: '',
     url: '',
-    type: 'pdf' // Default type
+    type: 'pdf'
 });
 
 const resourceTypes = [
@@ -101,7 +58,7 @@ const resourceTypes = [
 
 const addResource = () => {
     if (newResource.value.name && newResource.value.url) {
-        lesson.value.resources.push({
+        editedLesson.value.resources.push({
             name: newResource.value.name,
             url: newResource.value.url,
             type: newResource.value.type
@@ -116,7 +73,31 @@ const addResource = () => {
 };
 
 const removeResource = (index) => {
-    lesson.value.resources.splice(index, 1);
+    editedLesson.value.resources.splice(index, 1);
+};
+
+// Watch for lesson changes to update form
+watch(() => props.lesson, (newLesson) => {
+    if (newLesson) {
+        editedLesson.value = {
+            ...newLesson,
+            resources: newLesson.resources || []
+        };
+    }
+}, { immediate: true });
+
+const loading = ref(false);
+
+const fetchYoutubeData = () => {
+    loading.value = true;
+    setTimeout(() => {
+        loading.value = false;
+    }, 1000);
+};
+
+const updateLesson = () => {
+    emit('save', editedLesson.value);
+    emit('update:visible', false);
 };
 </script>
 
@@ -124,7 +105,7 @@ const removeResource = (index) => {
     <Dialog 
         :visible="props.visible" 
         modal 
-        header="Create New Lesson" 
+        header="Edit Lesson" 
         :style="{ width: '50vw' }"
         @update:visible="$emit('update:visible', $event)"
     >
@@ -132,7 +113,7 @@ const removeResource = (index) => {
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">YouTube URL</label>
                 <InputGroup>
-                    <InputText v-model="lesson.youtubeUrl" placeholder="Enter YouTube URL" class="w-full" />
+                    <InputText v-model="editedLesson.youtubeUrl" placeholder="Enter YouTube URL" class="w-full" />
                     <InputGroupAddon>
                         <Button 
                             icon="pi pi-search" 
@@ -145,18 +126,18 @@ const removeResource = (index) => {
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                <InputText v-model="lesson.title" placeholder="Lesson title" class="w-full" />
+                <InputText v-model="editedLesson.title" placeholder="Lesson title" class="w-full" />
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <Textarea v-model="lesson.description" rows="3" class="w-full" />
+                <Textarea v-model="editedLesson.description" rows="3" class="w-full" />
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Grade</label>
                 <Dropdown 
-                    v-model="lesson.grade" 
+                    v-model="editedLesson.grade" 
                     :options="grades" 
                     placeholder="Select Grade"
                     class="w-full"
@@ -166,24 +147,13 @@ const removeResource = (index) => {
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tags</label>
                 <MultiSelect
-                    v-model="lesson.tags"
-                    :options="availableTags"
-                    optionLabel="name"
+                    v-model="editedLesson.tags"
+                    :options="tags"
                     placeholder="Select Tags"
-                    :filter="true"
+                    :selectionLimit="3"
+                    :showToggleAll="false"
                     class="w-full"
                 />
-                <InputGroup class="mt-2">
-                    <InputGroupAddon>
-                        <i class="pi pi-plus" />
-                    </InputGroupAddon>
-                    <InputText
-                        v-model="newTag"
-                        placeholder="Type tag then press Enter"
-                        @keydown.enter.prevent="handleNewTag"
-                        class="w-full"
-                    />
-                </InputGroup>
             </div>
 
             <div>
@@ -237,8 +207,8 @@ const removeResource = (index) => {
                 </div>
 
                 <!-- Resource List -->
-                <div v-if="lesson.resources.length > 0" class="space-y-2 border border-gray-100 rounded-lg p-3">
-                    <div v-for="(resource, index) in lesson.resources" 
+                <div v-if="editedLesson.resources.length > 0" class="space-y-2 border border-gray-100 rounded-lg p-3">
+                    <div v-for="(resource, index) in editedLesson.resources" 
                          :key="index"
                          class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:border-primary-500 hover:bg-primary-50 transition-all duration-200">
                         <div class="flex items-center gap-3">
@@ -265,7 +235,7 @@ const removeResource = (index) => {
 
         <template #footer>
             <Button label="Cancel" @click="$emit('update:visible', false)" text />
-            <Button label="Create Lesson" @click="createLesson" />
+            <Button label="Save Changes" @click="updateLesson" />
         </template>
     </Dialog>
 </template>

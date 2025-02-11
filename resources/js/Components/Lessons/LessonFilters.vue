@@ -6,14 +6,21 @@ import MultiSelect from "primevue/multiselect";
 import Button from "primevue/button";
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
+import { isStudent } from "@/Utils/IsStudent";
 
 const props = defineProps({
     searchQuery: String,
     selectedGrade: String,
-    selectedTags: Array,
+    selectedTags: {
+        type: Array,
+        default: () => []
+    },
     sortBy: String,
     grades: Array,
-    tags: Array,
+    tags: {
+        type: Array,
+        default: () => []
+    },
     sortOptions: Array,
     hasActiveFilters: Boolean
 });
@@ -60,6 +67,7 @@ const vSortBy = computed({
             </InputGroup>
             <div class="flex gap-4">
                 <Dropdown
+                    v-if="!isStudent()"
                     v-model="vSelectedGrade"
                     :options="grades"
                     placeholder="Select Grade"
@@ -78,9 +86,10 @@ const vSortBy = computed({
             <MultiSelect
                 v-model="vSelectedTags"
                 :options="tags"
-                optionLabel="name"
                 placeholder="Select Tags"
                 class="flex-1"
+                :selectionLimit="3"
+                :showToggleAll="false"
             />
             <Button 
                 v-if="props.hasActiveFilters"

@@ -1,113 +1,115 @@
 <template>
-  <header class="bg-white border-b border-gray-100">
-    <div class="flex items-center justify-between px-4 md:px-6 py-4">
-      <!-- Search Section -->
-      <div class="hidden md:flex items-center flex-1 max-w-2xl">
-        <span class="p-input-icon-left w-full">
-          <InputGroup class="w-full">
-            <InputGroupAddon>
-              <i class="pi pi-search text-gray-400"></i>
-            </InputGroupAddon>
-            <InputText 
-              type="text" 
-              v-model="search" 
-              placeholder="Search anything..." 
-              class="w-full border-0 bg-gray-50/80 focus:bg-white transition-colors"
-            />
-            <InputGroupAddon class="hidden lg:flex">
-              <Kbd>⌘K</Kbd>
-            </InputGroupAddon>
-          </InputGroup>
-        </span>
-      </div>
-
-      <!-- Mobile Search Button -->
-      <Button 
-        icon="pi pi-search"
-        class="block md:!hidden p-button-rounded p-button-text p-button-plain"
-        @click="toggleMobileSearch"
-      />
-
-      <!-- Actions Section -->
-      <div class="flex items-center space-x-2 md:space-x-6">
-        <!-- Notifications -->
-        <div class="relative hidden sm:block">
-          <Button 
-            icon="pi pi-bell" 
-            class="p-button-rounded p-button-text p-button-plain hover:bg-gray-50"
-            badge="2"
-            badge-class="bg-red-500"
-            v-tooltip.bottom="'Notifications'"
-          />
+  <header class="bg-white border-b border-gray-100 backdrop-blur-sm bg-white/90">
+    <div>
+      <div class="flex items-center justify-between px-5 md:px-6 py-4">
+        <!-- Search Section -->
+        <div class="hidden md:flex items-center flex-1 max-w-2xl">
+          <span class="p-input-icon-left w-full">
+            <InputGroup class="w-full">
+              <InputGroupAddon>
+                <i class="pi pi-search text-gray-400"></i>
+              </InputGroupAddon>
+              <InputText 
+                type="text" 
+                v-model="search" 
+                placeholder="Search anything..." 
+                class="w-full border-0 bg-gray-50/80 focus:bg-white transition-colors"
+              />
+              <InputGroupAddon class="hidden lg:flex">
+                <Kbd>⌘K</Kbd>
+              </InputGroupAddon>
+            </InputGroup>
+          </span>
         </div>
 
-        <!-- Messages -->
-        <div class="relative hidden sm:block">
-          <Button 
-            icon="pi pi-envelope" 
-            class="p-button-rounded p-button-text p-button-plain hover:bg-gray-50"
-            badge="3"
-            badge-class="bg-blue-500"
-            v-tooltip.bottom="'Messages'"
-          />
-        </div>
-
-        <!-- Divider -->
-        <div class="hidden sm:block h-8 w-px bg-gray-200"></div>
-
-        <!-- User Profile -->
-        <div class="flex items-center space-x-3">
-          <Link :href="route('profile.show')">
-            <Avatar 
-              :image="userPhotoUrl" 
-              shape="circle" 
-              size="normal"
-              class="ring-2 ring-primary-100 cursor-pointer hover:ring-primary-200 transition-all"
-            />
-          </Link>
-          <div class="hidden md:block">
-            <Link 
-              :href="route('profile.show')"
-              class="hover:text-primary-600 transition-colors"
-            >
-              <h3 class="text-sm font-medium text-gray-700">{{ userName }}</h3>
-              <p class="text-xs text-gray-500">{{ userRole }}</p>
-            </Link>
-          </div>
-          <Button 
-            icon="pi pi-chevron-down"
-            class="p-button-rounded p-button-text p-button-plain !p-2"
-            @click="toggleMenu"
-            aria-haspopup="true"
-            aria-controls="user-menu"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- Mobile Search Overlay -->
-    <div v-if="showMobileSearch" class="md:hidden px-4 pb-4">
-      <InputGroup class="w-full">
-        <InputGroupAddon>
-          <i class="pi pi-search text-gray-400"></i>
-        </InputGroupAddon>
-        <InputText 
-          type="text" 
-          v-model="search" 
-          placeholder="Search anything..." 
-          class="w-full border-0 bg-gray-50/80 focus:bg-white transition-colors"
+        <!-- Mobile Search Button -->
+        <Button 
+          icon="pi pi-search"
+          class="block md:!hidden p-button-rounded p-button-text p-button-plain"
+          @click="toggleMobileSearch"
         />
-      </InputGroup>
-    </div>
 
-    <!-- User Menu -->
-    <Menu 
-      id="user-menu"
-      ref="menu" 
-      :model="menuItems" 
-      :popup="true"
-      class="!min-w-[200px]"
-    />
+        <!-- Actions Section -->
+        <div class="flex items-center space-x-2 md:space-x-6">
+          <!-- Notifications -->
+          <div class="relative hidden sm:block">
+            <Button 
+              icon="pi pi-bell" 
+              class="p-button-rounded p-button-text p-button-plain hover:bg-gray-50"
+              badge="2"
+              badge-class="bg-red-500"
+              v-tooltip.bottom="'Notifications'"
+            />
+          </div>
+
+          <!-- Messages -->
+          <div class="relative hidden sm:block">
+            <Button 
+              icon="pi pi-envelope" 
+              class="p-button-rounded p-button-text p-button-plain hover:bg-gray-50"
+              badge="3"
+              badge-class="bg-blue-500"
+              v-tooltip.bottom="'Messages'"
+            />
+          </div>
+
+          <!-- Divider -->
+          <div class="hidden sm:block h-8 w-px bg-gray-200"></div>
+
+          <!-- User Profile -->
+          <div class="flex items-center space-x-3">
+            <Link :href="route('profile.show')">
+              <Avatar 
+                :image="userPhotoUrl" 
+                shape="circle" 
+                size="normal"
+                class="ring-2 ring-primary-100 cursor-pointer hover:ring-primary-200 transition-all"
+              />
+            </Link>
+            <div class="hidden md:block">
+              <Link 
+                :href="route('profile.show')"
+                class="hover:text-primary-600 transition-colors"
+              >
+                <h3 class="text-sm font-medium text-gray-700">{{ userName }}</h3>
+                <p class="text-xs text-gray-500">{{ userRole }}</p>
+              </Link>
+            </div>
+            <Button 
+              icon="pi pi-chevron-down"
+              class="p-button-rounded p-button-text p-button-plain !p-2"
+              @click="toggleMenu"
+              aria-haspopup="true"
+              aria-controls="user-menu"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Search Overlay -->
+      <div v-if="showMobileSearch" class="md:hidden px-4 pb-4">
+        <InputGroup class="w-full">
+          <InputGroupAddon>
+            <i class="pi pi-search text-gray-400"></i>
+          </InputGroupAddon>
+          <InputText 
+            type="text" 
+            v-model="search" 
+            placeholder="Search anything..." 
+            class="w-full border-0 bg-gray-50/80 focus:bg-white transition-colors"
+          />
+        </InputGroup>
+      </div>
+
+      <!-- User Menu -->
+      <Menu 
+        id="user-menu"
+        ref="menu" 
+        :model="menuItems" 
+        :popup="true"
+        class="!min-w-[200px]"
+      />
+    </div>
   </header>
 </template>
 
@@ -237,5 +239,10 @@ onUnmounted(() => {
 
 :deep(.p-menu .p-menuitem-link .p-badge) {
   margin-left: auto;
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 </style>

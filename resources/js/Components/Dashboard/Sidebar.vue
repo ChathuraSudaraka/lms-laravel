@@ -1,5 +1,5 @@
 <template>
-  <div :class="['fixed left-0 top-0 h-full bg-white shadow-sm border-r border-gray-100 flex flex-col transition-all duration-300',
+  <div :class="['fixed left-0 top-0 h-full bg-white shadow-sm border-r border-gray-100 flex flex-col transition-all duration-300 z-50',
     sidebarStore.isCollapsed ? 'w-[4.5rem]' : 'w-64']">
     <!-- Collapse Button -->
     <Button v-show="!sidebarStore.isMobile" @click="sidebarStore.toggleSidebar"
@@ -19,9 +19,8 @@
       </div>
       <!-- Collapsed Logo -->
       <div v-else class="w-full flex justify-center">
-        <div
-          class="w-9 h-9 bg-gradient-to-br from-primary-600 to-primary-700 rounded-lg flex items-center justify-center shadow-sm">
-          <span class="text-white font-bold text-lg">D</span>
+        <div class="w-9 h-9 rounded-lg flex items-center justify-center overflow-hidden">
+          <img src="/logo.png" alt="Logo" class="w-full h-full object-cover">
         </div>
       </div>
     </div>
@@ -33,17 +32,17 @@
         <h2 class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1 px-4"
           v-show="!sidebarStore.isCollapsed">Main Menu</h2>
         <div class="space-y-0.5">
-          <MenuItem v-for="item in mainMenuItems" :key="item.label" v-bind="item"
+          <MenuItem v-for="item in filteredMainMenu" :key="item.label" v-bind="item"
             :active="item.route && currentPath === getPath(item.route)" />
         </div>
       </div>
 
       <!-- Management -->
-      <div class="px-2 mt-4">
+      <div v-if="filteredManagementMenu.length > 0" class="px-2 mt-4">
         <h2 class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 px-4"
-          v-show="!sidebarStore.isCollapsed">Management</h2>
+          v-show="!sidebarStore.isCollapsed">{{ isStudent() ? 'Resources' : 'Management' }}</h2>
         <div class="space-y-0.5">
-          <MenuItem v-for="item in managementItems" :key="item.label" v-bind="item"
+          <MenuItem v-for="item in filteredManagementMenu" :key="item.label" v-bind="item"
             :active="item.route && currentPath === getPath(item.route)" />
         </div>
       </div>
@@ -93,15 +92,14 @@
 import { onMounted, onUnmounted, computed } from 'vue'
 import { useSidebarStore } from '@/Stores/sidebarStore'
 import { usePage } from '@inertiajs/vue3'
-import { router } from '@inertiajs/vue3'
-
 import MenuItem from './MenuItem.vue'
 import Button from 'primevue/button'
+import { isStudent } from '@/Utils/IsStudent'
 
 // Remove the Tooltip import since it's globally registered
-
 const sidebarStore = useSidebarStore()
 const page = usePage()
+const userRole = computed(() => page.props.auth.user.role);
 
 // Compute the current URL path.
 const currentPath = computed(() => {
@@ -127,17 +125,20 @@ const mainMenuItems = [
   {
     label: 'Overview',
     icon: 'pi-chart-line',
-    route: route('console.dashboard')
+    route: route('console.dashboard'),
+    allowedRoles: ['admin', 'moderator', 'student']
   },
   {
     label: 'Students',
     icon: 'pi-users',
     route: route('console.students'),
+    allowedRoles: ['admin', 'moderator']
   },
   {
     label: 'Moderators',
     icon: 'pi-user-edit',
     route: route('console.moderators'),
+    allowedRoles: ['admin']
   },
 ]
 
@@ -145,19 +146,31 @@ const managementItems = [
   {
     label: 'Lessons',
     icon: 'pi-book',
-    route: route('console.lessons')
+    route: route('console.lessons.index'),
+    allowedRoles: ['admin', 'moderator', 'student']
   },
   {
     label: 'Quizzes',
     icon: 'pi-check-square',
-    route: route('console.quizzes.index')
+    route: route('console.quizzes.index'),
+    allowedRoles: ['admin', 'moderator', 'student']
   },
   {
     label: 'Products',
     icon: 'pi-box',
-    route: route('console.products')
+    route: route('console.products'),
+    allowedRoles: ['admin', , 'student']
   }
 ]
+
+// Filter items based on user role
+const filteredMainMenu = computed(() => 
+  mainMenuItems.filter(item => item.allowedRoles.includes(userRole.value))
+);
+
+const filteredManagementMenu = computed(() => 
+  managementItems.filter(item => item.allowedRoles.includes(userRole.value))
+);
 </script>
 
 <style scoped>

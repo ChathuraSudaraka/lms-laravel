@@ -6,6 +6,7 @@ import { Omega } from "./Theme/Omega";
 import VueApexCharts from 'vue3-apexcharts'
 import 'primeicons/primeicons.css'
 import Tooltip from 'primevue/tooltip'
+import ToastService from 'primevue/toastservice'
 
 import { createPinia } from 'pinia'
 
@@ -39,6 +40,7 @@ createInertiaApp({
                 }, 
                 ripple: true 
             })
+            .use(ToastService) // Add this line
             .directive('tooltip', Tooltip)
             .mount(el);
         return app;

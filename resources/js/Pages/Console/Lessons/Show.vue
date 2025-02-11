@@ -10,6 +10,9 @@ import { useLessonFilters } from '@/Composables/useLessonFilters';
 import { useSidebarStore } from '@/Stores/sidebarStore';
 import { ref, computed, watch } from 'vue';
 import Paginator from 'primevue/paginator';
+import { isStudent } from "@/Utils/IsStudent";
+import EditLessonModal from "@/Components/Lessons/EditLessonModal.vue";
+import DeleteLessonModal from "@/Components/Lessons/DeleteLessonModal.vue";
 
 const createModal = ref(false);
 const loading = ref(false);
@@ -20,7 +23,7 @@ const lessons = ref([
         description: 'Learn the basics of algebraic expressions and equations',
         thumbnail: 'https://img.youtube.com/vi/XXXXX/maxresdefault.jpg',
         grade: '10',
-        tags: [{ name: 'Mathematics', code: 'math' }],
+        tags: ['Mathematics'],
         createdAt: '2024-01-15'
     },
     {
@@ -29,7 +32,7 @@ const lessons = ref([
         description: 'Explore the basic structure and functions of cells',
         thumbnail: 'https://img.youtube.com/vi/YYYYY/maxresdefault.jpg',
         grade: '9',
-        tags: [{ name: 'Biology', code: 'bio' }],
+        tags: ['Biology'],
         createdAt: '2024-01-16'
     },
     {
@@ -38,161 +41,8 @@ const lessons = ref([
         description: 'Understanding ionic and covalent bonds in chemistry',
         thumbnail: 'https://img.youtube.com/vi/ZZZZZ/maxresdefault.jpg',
         grade: '11',
-        tags: [{ name: 'Chemistry', code: 'chem' }],
+        tags: ['Chemistry'],
         createdAt: '2024-01-17'
-    },
-    {
-        id: 4,
-        title: 'Forces and Motion',
-        description: 'Learn about Newton\'s laws of motion and their applications',
-        thumbnail: 'https://img.youtube.com/vi/WWWWW/maxresdefault.jpg',
-        grade: '10',
-        tags: [{ name: 'Physics', code: 'phys' }],
-        createdAt: '2024-01-18'
-    },
-    {
-        id: 5,
-        title: 'Advanced Geometry',
-        description: 'Exploring complex geometric concepts and proofs',
-        thumbnail: 'https://img.youtube.com/vi/VVVVV/maxresdefault.jpg',
-        grade: '11',
-        tags: [{ name: 'Mathematics', code: 'math' }],
-        createdAt: '2024-01-19'
-    },
-    {
-        id: 1,
-        title: 'Introduction to Algebra',
-        description: 'Learn the basics of algebraic expressions and equations',
-        thumbnail: 'https://img.youtube.com/vi/XXXXX/maxresdefault.jpg',
-        grade: '10',
-        tags: [{ name: 'Mathematics', code: 'math' }],
-        createdAt: '2024-01-15'
-    },
-    {
-        id: 2,
-        title: 'Cell Biology Fundamentals',
-        description: 'Explore the basic structure and functions of cells',
-        thumbnail: 'https://img.youtube.com/vi/YYYYY/maxresdefault.jpg',
-        grade: '9',
-        tags: [{ name: 'Biology', code: 'bio' }],
-        createdAt: '2024-01-16'
-    },
-    {
-        id: 3,
-        title: 'Introduction to Chemical Bonding',
-        description: 'Understanding ionic and covalent bonds in chemistry',
-        thumbnail: 'https://img.youtube.com/vi/ZZZZZ/maxresdefault.jpg',
-        grade: '11',
-        tags: [{ name: 'Chemistry', code: 'chem' }],
-        createdAt: '2024-01-17'
-    },
-    {
-        id: 4,
-        title: 'Forces and Motion',
-        description: 'Learn about Newton\'s laws of motion and their applications',
-        thumbnail: 'https://img.youtube.com/vi/WWWWW/maxresdefault.jpg',
-        grade: '10',
-        tags: [{ name: 'Physics', code: 'phys' }],
-        createdAt: '2024-01-18'
-    },
-    {
-        id: 5,
-        title: 'Advanced Geometry',
-        description: 'Exploring complex geometric concepts and proofs',
-        thumbnail: 'https://img.youtube.com/vi/VVVVV/maxresdefault.jpg',
-        grade: '11',
-        tags: [{ name: 'Mathematics', code: 'math' }],
-        createdAt: '2024-01-19'
-    },
-    {
-        id: 1,
-        title: 'Introduction to Algebra',
-        description: 'Learn the basics of algebraic expressions and equations',
-        thumbnail: 'https://img.youtube.com/vi/XXXXX/maxresdefault.jpg',
-        grade: '10',
-        tags: [{ name: 'Mathematics', code: 'math' }],
-        createdAt: '2024-01-15'
-    },
-    {
-        id: 2,
-        title: 'Cell Biology Fundamentals',
-        description: 'Explore the basic structure and functions of cells',
-        thumbnail: 'https://img.youtube.com/vi/YYYYY/maxresdefault.jpg',
-        grade: '9',
-        tags: [{ name: 'Biology', code: 'bio' }],
-        createdAt: '2024-01-16'
-    },
-    {
-        id: 3,
-        title: 'Introduction to Chemical Bonding',
-        description: 'Understanding ionic and covalent bonds in chemistry',
-        thumbnail: 'https://img.youtube.com/vi/ZZZZZ/maxresdefault.jpg',
-        grade: '11',
-        tags: [{ name: 'Chemistry', code: 'chem' }],
-        createdAt: '2024-01-17'
-    },
-    {
-        id: 4,
-        title: 'Forces and Motion',
-        description: 'Learn about Newton\'s laws of motion and their applications',
-        thumbnail: 'https://img.youtube.com/vi/WWWWW/maxresdefault.jpg',
-        grade: '10',
-        tags: [{ name: 'Physics', code: 'phys' }],
-        createdAt: '2024-01-18'
-    },
-    {
-        id: 5,
-        title: 'Advanced Geometry',
-        description: 'Exploring complex geometric concepts and proofs',
-        thumbnail: 'https://img.youtube.com/vi/VVVVV/maxresdefault.jpg',
-        grade: '11',
-        tags: [{ name: 'Mathematics', code: 'math' }],
-        createdAt: '2024-01-19'
-    },
-    {
-        id: 1,
-        title: 'Introduction to Algebra',
-        description: 'Learn the basics of algebraic expressions and equations',
-        thumbnail: 'https://img.youtube.com/vi/XXXXX/maxresdefault.jpg',
-        grade: '10',
-        tags: [{ name: 'Mathematics', code: 'math' }],
-        createdAt: '2024-01-15'
-    },
-    {
-        id: 2,
-        title: 'Cell Biology Fundamentals',
-        description: 'Explore the basic structure and functions of cells',
-        thumbnail: 'https://img.youtube.com/vi/YYYYY/maxresdefault.jpg',
-        grade: '9',
-        tags: [{ name: 'Biology', code: 'bio' }],
-        createdAt: '2024-01-16'
-    },
-    {
-        id: 3,
-        title: 'Introduction to Chemical Bonding',
-        description: 'Understanding ionic and covalent bonds in chemistry',
-        thumbnail: 'https://img.youtube.com/vi/ZZZZZ/maxresdefault.jpg',
-        grade: '11',
-        tags: [{ name: 'Chemistry', code: 'chem' }],
-        createdAt: '2024-01-17'
-    },
-    {
-        id: 4,
-        title: 'Forces and Motion',
-        description: 'Learn about Newton\'s laws of motion and their applications',
-        thumbnail: 'https://img.youtube.com/vi/WWWWW/maxresdefault.jpg',
-        grade: '10',
-        tags: [{ name: 'Physics', code: 'phys' }],
-        createdAt: '2024-01-18'
-    },
-    {
-        id: 5,
-        title: 'Advanced Geometry',
-        description: 'Exploring complex geometric concepts and proofs',
-        thumbnail: 'https://img.youtube.com/vi/VVVVV/maxresdefault.jpg',
-        grade: '11',
-        tags: [{ name: 'Mathematics', code: 'math' }],
-        createdAt: '2024-01-19'
     },
 ]);
 
@@ -202,16 +52,15 @@ const {
     selectedTags,
     sortBy,
     grades,
-    tags,
+    tags, // Now computed from lessons
     sortOptions,
     hasActiveFilters,
-    filterLessons,
     resetFilters,
     pagination,
     filterAndPaginateLessons,
     onPage,
     resetAll
-} = useLessonFilters();
+} = useLessonFilters(lessons); // Pass lessons ref
 
 const sidebarStore = useSidebarStore();
 
@@ -254,14 +103,42 @@ const handleCreateLesson = (lessonData) => {
         createdAt: new Date().toISOString().split('T')[0]
     });
 };
+
+// Add refs for modals and selected lesson
+const editModal = ref(false);
+const deleteModal = ref(false);
+const selectedLesson = ref(null);
+
+// Add handlers
+const handleEditLesson = (lesson) => {
+    selectedLesson.value = lesson;
+    editModal.value = true;
+};
+
+const handleDeleteLesson = (lesson) => {
+    selectedLesson.value = lesson;
+    deleteModal.value = true;
+};
+
+const updateLesson = (updatedLesson) => {
+    const index = lessons.value.findIndex(l => l.id === updatedLesson.id);
+    if (index !== -1) {
+        lessons.value[index] = { ...updatedLesson };
+    }
+};
+
+const deleteLesson = (lesson) => {
+    lessons.value = lessons.value.filter(l => l.id !== lesson.id);
+    deleteModal.value = false;
+};
 </script>
 
 <template>
     <AppLayout>
         <div class="w-full p-4 md:p-6 lg:p-8 bg-white rounded-lg mb-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <Heading title="Lessons" description="Create and manage your video lessons" />
-                <Button label="Create Lesson" icon="pi pi-plus" @click="createModal = true" class="w-full sm:w-auto" />
+                <Heading title="Lessons" :description="isStudent() ? 'Browse and learn from video lessons' : 'Create and manage your video lessons'" />
+                <Button v-if="!isStudent()" label="Create Lesson" icon="pi pi-plus" @click="createModal = true" class="w-full sm:w-auto" />
             </div>
 
             <LessonFilters v-model:searchQuery="searchQuery" v-model:selectedGrade="selectedGrade"
@@ -286,7 +163,13 @@ const handleCreateLesson = (lessonData) => {
                     </div>
                 </template>
                 <template v-else>
-                    <LessonCard v-for="lesson in paginatedLessons.items" :key="lesson.id" :lesson="lesson" />
+                    <LessonCard 
+                        v-for="lesson in paginatedLessons.items" 
+                        :key="lesson.id" 
+                        :lesson="lesson"
+                        @edit="handleEditLesson"
+                        @delete="handleDeleteLesson"
+                    />
                 </template>
             </div>
 
@@ -314,6 +197,18 @@ const handleCreateLesson = (lessonData) => {
         </div>
 
         <CreateLessonModal v-model:visible="createModal" :grades="grades" @save="handleCreateLesson" />
+        <EditLessonModal 
+            v-model:visible="editModal"
+            :lesson="selectedLesson"
+            :grades="grades"
+            :tags="tags"
+            @save="updateLesson"
+        />
+        <DeleteLessonModal
+            v-model:visible="deleteModal"
+            :lesson="selectedLesson"
+            @confirm="deleteLesson"
+        />
     </AppLayout>
 </template>
 

@@ -2,7 +2,7 @@
   <Link
     v-if="route"
     :href="route"
-    class="block"
+    class="block group"
     :class="{ 'focus:outline-none': true }"
   >
     <button
@@ -13,19 +13,19 @@
         sidebarStore.isCollapsed ? 'justify-center p-1.5' : 'px-4 py-2.5',
         active ? 
           'bg-gradient-to-r from-primary-500/10 to-primary-500/5 text-primary-700' : 
-          'text-gray-600 hover:bg-white'
+          'text-gray-600 hover:bg-white group-hover:translate-x-1'
       ]"
       v-tooltip.right="sidebarStore.isCollapsed && !sidebarStore.isMobile ? label : ''"
     >
       <div :class="[
-        'rounded-lg flex items-center justify-center transition-all',
+        'rounded-lg flex items-center justify-center transition-all duration-200',
         sidebarStore.isCollapsed ? 'w-10 h-10' : 'w-8 h-8 mr-3',
-        active ? 'bg-primary-100' : 'bg-gray-50 hover:bg-gray-100'
+        active ? 'bg-primary-100' : 'bg-gray-50 group-hover:bg-primary-50'
       ]">
         <i :class="[
-          'pi', icon, 'transition-colors',
+          'pi', icon, 'transition-colors duration-200',
           sidebarStore.isCollapsed ? 'text-xl' : 'text-lg',
-          active ? 'text-primary-600' : 'text-gray-400'
+          active ? 'text-primary-600' : 'text-gray-400 group-hover:text-primary-500'
         ]"></i>
       </div>
       <template v-if="!sidebarStore.isCollapsed">
@@ -53,24 +53,24 @@
     v-else
     @click="handleClick"
     :class="[
-      'w-full flex items-center rounded-lg transition-all duration-200 relative',
+      'w-full flex items-center rounded-lg transition-all duration-200 relative group',
       'text-left focus:outline-none focus:ring-2 focus:ring-primary-500/20',
       sidebarStore.isCollapsed ? 'justify-center p-1.5' : 'px-4 py-2.5',
       active ? 
         'bg-gradient-to-r from-primary-500/10 to-primary-500/5 text-primary-700' : 
-        'text-gray-600 hover:bg-white'
+        'text-gray-600 hover:bg-white hover:translate-x-1'
     ]"
     v-tooltip.right="sidebarStore.isCollapsed && !sidebarStore.isMobile ? label : ''"
   >
     <div :class="[
-      'rounded-lg flex items-center justify-center transition-all',
+      'rounded-lg flex items-center justify-center transition-all duration-200',
       sidebarStore.isCollapsed ? 'w-10 h-10' : 'w-8 h-8 mr-3',
-      active ? 'bg-primary-100' : 'bg-gray-50 hover:bg-gray-100'
+      active ? 'bg-primary-100' : 'bg-gray-50 group-hover:bg-primary-50'
     ]">
       <i :class="[
-        'pi', icon, 'transition-colors',
+        'pi', icon, 'transition-colors duration-200',
         sidebarStore.isCollapsed ? 'text-xl' : 'text-lg',
-        active ? 'text-primary-600' : 'text-gray-400'
+        active ? 'text-primary-600' : 'text-gray-400 group-hover:text-primary-500'
       ]"></i>
     </div>
     <template v-if="!sidebarStore.isCollapsed">
@@ -147,5 +147,10 @@ function handleClick() {
   min-width: 1.5rem;
   height: 1.5rem;
   padding: 0;
+}
+
+/* Add smooth transition for hover effects */
+button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 </style>

@@ -27,9 +27,15 @@ Route::middleware([
     Route::get('/moderators', function () {
         return Inertia::render('Console/Moderators');
     })->name('moderators');
-    Route::get('/lessons', function () {
-        return Inertia::render('Console/Lessons/Show');
-    })->name('lessons');
+    Route::prefix('lessons')->name('lessons.')->group(function () {
+        Route::get('/', function () {
+            return Inertia::render('Console/Lessons/Show');
+        })->name('index');
+        
+        Route::get('/{id}', function ($id) {
+            return Inertia::render('Console/Lessons/Single');
+        })->name('view');
+    });
     Route::get('/quizzes', function () {
         return Inertia::render('Console/Quizzes/Show');
     })->name('quizzes');

@@ -6,7 +6,10 @@
       'transition-all duration-300',
       sidebarStore.isCollapsed ? 'ml-[4.5rem]' : 'ml-64'
     ]">
-      <Header :userPhotoUrl="$page.props.auth.user.profile_photo_url" />
+      <Header 
+        :userPhotoUrl="$page.props.auth.user.profile_photo_url" 
+        class="sticky top-0 z-40"
+      />
 
       <main class="p-6">
         <slot />
