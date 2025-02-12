@@ -10,10 +10,18 @@ import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 import CreateProductModal from "@/Components/Products/CreateProductModal.vue";
 import ProductCard from "@/Components/Products/ProductCard.vue";
+import EditProductModal from "@/Components/Products/EditProductModal.vue";
+import DeleteProductModal from "@/Components/Products/DeleteProductModal.vue";
+import RedeemProductModal from "@/Components/Products/RedeemProductModal.vue";
 import { ref, computed, watch } from 'vue';
 import { useSidebarStore } from '@/Stores/sidebarStore';
+import { isAdmin } from "@/Utils/IsAdmin";
 
 const createModal = ref(false);
+const editModal = ref(false);
+const deleteModal = ref(false);
+const redeemModal = ref(false);
+const selectedProduct = ref(null);
 const loading = ref(false);
 const searchQuery = ref('');
 const sortBy = ref('newest');
@@ -25,7 +33,13 @@ const products = ref([
         image: 'https://placehold.co/300x200?text=Science+Kit',
         stars: 100,
         requiredStars: 50,
-        createdAt: '2024-01-15'
+        createdAt: '2024-01-15',
+        updatedAt: '2024-01-15',
+        totalRedeemed: 45,
+        totalViews: 150,
+        conversionRate: 30,
+        successRate: 95,
+        inventory: 100
     },
     {
         id: 2,
@@ -34,7 +48,13 @@ const products = ref([
         image: 'https://placehold.co/300x200?text=Smart+Watch',
         stars: 85,
         requiredStars: 75,
-        createdAt: '2024-01-14'
+        createdAt: '2024-01-14',
+        updatedAt: '2024-01-14',
+        totalRedeemed: 30,
+        totalViews: 120,
+        conversionRate: 25,
+        successRate: 90,
+        inventory: 75
     },
     {
         id: 3,
@@ -42,7 +62,14 @@ const products = ref([
         description: 'Premium wireless earbuds with noise cancellation',
         image: 'https://placehold.co/300x200?text=Earbuds',
         stars: 95,
-        createdAt: '2024-01-13'
+        requiredStars: 130,
+        createdAt: '2024-01-13',
+        updatedAt: '2024-01-13',
+        totalRedeemed: 60,
+        totalViews: 200,
+        conversionRate: 30,
+        successRate: 88,
+        inventory: 50
     },
     {
         id: 4,
@@ -50,7 +77,14 @@ const products = ref([
         description: 'Comfortable athletic shoes for everyday wear',
         image: 'https://placehold.co/300x200?text=Sneakers',
         stars: 120,
-        createdAt: '2024-01-12'
+        requiredStars: 150,
+        createdAt: '2024-01-12',
+        updatedAt: '2024-01-12',
+        totalRedeemed: 80,
+        totalViews: 250,
+        conversionRate: 32,
+        successRate: 92,
+        inventory: 150
     },
     {
         id: 5,
@@ -58,7 +92,14 @@ const products = ref([
         description: 'Track your health and fitness goals',
         image: 'https://placehold.co/300x200?text=Fitness+Band',
         stars: 88,
-        createdAt: '2024-01-11'
+        requiredStars: 100,
+        createdAt: '2024-01-11',
+        updatedAt: '2024-01-11',
+        totalRedeemed: 40,
+        totalViews: 180,
+        conversionRate: 22,
+        successRate: 85,
+        inventory: 65
     },
     {
         id: 6,
@@ -66,7 +107,14 @@ const products = ref([
         description: 'Portable wireless speaker with deep bass',
         image: 'https://placehold.co/300x200?text=Speaker',
         stars: 92,
-        createdAt: '2024-01-10'
+        requiredStars: 100,
+        createdAt: '2024-01-10',
+        updatedAt: '2024-01-10',
+        totalRedeemed: 55,
+        totalViews: 190,
+        conversionRate: 29,
+        successRate: 87,
+        inventory: 80
     }
 ]);
 
@@ -128,6 +176,62 @@ const handleCreateProduct = (productData) => {
     });
 };
 
+const handleEditProduct = (product) => {
+    console.log('Edit product:', product); // Add this for debugging
+    selectedProduct.value = { ...product }; // Create a copy of the product
+    editModal.value = true;
+};
+
+const handleDeleteProduct = (product) => {
+    console.log('Delete product:', product); // Add this for debugging
+    selectedProduct.value = { ...product }; // Create a copy of the product
+    deleteModal.value = true;
+};
+
+const handleProductUpdate = (updatedProduct) => {
+    const index = products.value.findIndex(p => p.id === updatedProduct.id);
+    if (index !== -1) {
+        products.value[index] = { ...updatedProduct, updatedAt: new Date().toISOString() };
+    }
+    editModal.value = false;
+};
+
+const handleProductDelete = (product) => {
+    products.value = products.value.filter(p => p.id !== product.id);
+    deleteModal.value = false;
+};
+
+const handleProductRedeem = (product) => {
+    selectedProduct.value = product;
+    redeemModal.value = true;
+};
+
+const confirmRedeem = (product) => {
+    // Here you would typically call your API to process the redemption
+    console.log('Redeeming product:', product);
+    
+    // Update the product's inventory and stats
+    const index = products.value.findIndex(p => p.id === product.id);
+    if (index !== -1) {
+        products.value[index] = {
+            ...product,
+            inventory: product.inventory - 1,
+            totalRedeemed: product.totalRedeemed + 1
+        };
+    }
+
+    // Close modal
+    redeemModal.value = false;
+
+    // Show success message
+    toast.add({
+        severity: 'success',
+        summary: 'Product Redeemed',
+        detail: `Successfully redeemed ${product.name}`,
+        life: 3000
+    });
+};
+
 const resetFilters = () => {
     searchQuery.value = '';
     sortBy.value = 'newest';
@@ -168,8 +272,11 @@ const gridClasses = computed(() => ({
         <div class="w-full p-4 md:p-6 lg:p-8 bg-white rounded-lg mb-6">
             <!-- Header -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <Heading title="Products" description="Browse and manage available products" />
-                <Button label="Add Product" icon="pi pi-plus" @click="createModal = true" class="w-full sm:w-auto" />
+                <Heading 
+                    title="Products" 
+                    :description="isAdmin() ? 'Browse and manage available products' : 'Browse and redeem products with your stars'" 
+                />
+                <Button v-if="isAdmin()" label="Add Product" icon="pi pi-plus" @click="createModal = true" class="w-full sm:w-auto" />
             </div>
 
             <!-- Filters -->
@@ -194,7 +301,14 @@ const gridClasses = computed(() => ({
                     </div>
                 </template>
                 <template v-else>
-                    <ProductCard v-for="product in paginatedProducts.items" :key="product.id" :product="product" />
+                    <ProductCard 
+                        v-for="product in paginatedProducts.items" 
+                        :key="product.id" 
+                        :product="product"
+                        @edit="handleEditProduct"
+                        @delete="handleDeleteProduct"
+                        @redeem="handleProductRedeem"
+                    />
                 </template>
             </div>
 
@@ -221,7 +335,32 @@ const gridClasses = computed(() => ({
         </div>
 
         <!-- Create Product Modal -->
-        <CreateProductModal v-model="createModal" @save="handleCreateProduct" />
+        <CreateProductModal 
+            v-model:visible="createModal" 
+            @save="handleCreateProduct" 
+        />
+        
+        <EditProductModal 
+            v-model:visible="editModal"
+            :product="selectedProduct"
+            @save="handleProductUpdate"
+            @update:visible="(val) => editModal = val"
+        />
+        
+        <DeleteProductModal
+            v-model:visible="deleteModal"
+            :product="selectedProduct"
+            @confirm="handleProductDelete"
+            @update:visible="(val) => deleteModal = val"
+        />
+
+        <RedeemProductModal
+            v-model:visible="redeemModal"
+            :product="selectedProduct"
+            :userStars="120"
+            @confirm="confirmRedeem"
+            @update:visible="(val) => redeemModal = val"
+        />
     </AppLayout>
 </template>
 
