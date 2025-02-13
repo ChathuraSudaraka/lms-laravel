@@ -36,15 +36,13 @@ Route::middleware([
             return Inertia::render('Console/Lessons/Single');
         })->name('view');
     });
-    Route::get('/quizzes', function () {
-        return Inertia::render('Console/Quizzes/Show');
-    })->name('quizzes');
+
     Route::get('/products', function () {
         return Inertia::render('Console/Products/Show');
     })->name('products');
 
     // Quiz Routes
-    Route::prefix('quizzes')->name('quizzes.')->group(function () {
+    Route::prefix('/quizzes')->name('quizzes.')->group(function () {
         Route::get('/', function () {
             return Inertia::render('Console/Quizzes/Show');
         })->name('index');

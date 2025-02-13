@@ -1,15 +1,8 @@
 <template>
     <div class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-2">
-                <label class="text-gray-600 font-medium">Quiz Name</label>
-                <InputText v-model="formData.name" placeholder="Enter quiz name" class="w-full" />
-            </div>
-            <div class="space-y-2">
-                <label class="text-gray-600 font-medium">Subject</label>
-                <Dropdown v-model="formData.subject" :options="subjects" optionLabel="name" 
-                    placeholder="Select subject" class="w-full" />
-            </div>
+        <div class="space-y-2">
+            <label class="text-gray-600 font-medium">Quiz Name</label>
+            <InputText v-model="formData.name" placeholder="Enter quiz name" class="w-full" />
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -67,18 +60,11 @@ import InputGroupAddon from 'primevue/inputgroupaddon';
 
 const emit = defineEmits(['update']);
 
-const subjects = [
-    { name: 'Mathematics', code: 'math' },
-    { name: 'Science', code: 'science' },
-    { name: 'English', code: 'english' },
-    // Add more subjects as needed
-];
-
 const grades = ['6', '7', '8', '9', '10', '11', '12', '13'];
 
 const formData = ref({
     name: '',
-    subject: null,
+    subject: 'Science', // Fixed value
     grade: null,
     timeLimit: null,
     questionsPerQuiz: null,

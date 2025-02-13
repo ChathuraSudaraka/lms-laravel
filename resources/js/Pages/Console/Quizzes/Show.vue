@@ -5,10 +5,13 @@
             
             <QuizFilters
                 v-model:searchQuery="searchQuery"
+                v-model:selectedGrade="selectedGrade"
                 v-model:selectedStatus="selectedStatus"
                 v-model:sortBy="sortBy"
                 :statusOptions="statusOptions"
                 :sortOptions="sortOptions"
+                :hasActiveFilters="hasActiveFilters"
+                @reset="resetFilters"
             />
 
             <!-- Quizzes Grid -->
@@ -40,7 +43,7 @@
                 <p class="text-gray-500 mb-4">
                     {{ searchQuery || selectedStatus ? 'Try adjusting your filters' : 'Start by creating a quiz' }}
                 </p>
-                <Link :href="route('console.quizzes.new')" v-if="!searchQuery && !selectedStatus">
+                <Link :href="route('console.quizzes.new')" v-if="!searchQuery && !selectedStatus && !isStudent()">
                     <Button label="Create First Quiz" icon="pi pi-plus" />
                 </Link>
                 <Button v-else label="Clear Filters" severity="secondary" @click="resetFilters" />
@@ -65,6 +68,7 @@
 </template>
 
 <script setup>
+import { isStudent } from '@/Utils/IsStudent';
 import AppLayout from "@/Layouts/AppLayout.vue";
 import QuizHeader from "@/Components/Quizzes/QuizHeader.vue";
 import QuizFilters from "@/Components/Quizzes/QuizFilters.vue";
@@ -81,6 +85,7 @@ const {
     searchQuery,
     sortBy,
     selectedStatus,
+    selectedGrade,
     loading,
     statusOptions,
     sortOptions,
@@ -89,51 +94,99 @@ const {
     resetFilters
 } = useQuizzes();
 
+// Initialize sortBy with the first option object
+sortBy.value = sortOptions[0];
+
+const hasActiveFilters = computed(() => {
+    const isDefaultSort = typeof sortBy.value === 'object' 
+        ? sortBy.value.value === 'newest'
+        : sortBy.value === 'newest';
+    
+    const isDefaultStatus = !selectedStatus.value || selectedStatus.value.value === null;
+
+    return Boolean(
+        searchQuery.value?.trim() || 
+        !isDefaultStatus || 
+        selectedGrade.value || 
+        !isDefaultSort
+    );
+});
+
 const quizzes = ref([
     {
         id: 1,
         title: 'JavaScript Fundamentals',
+        status: 'active',  // Ensure these match the statusOptions values exactly
         description: 'Test your knowledge of JavaScript basics',
-        status: 'active',
-        questionsCount: 20,
+        questionCount: 20,
         updatedAt: '2024-01-15',
-        timeLimit: 30
+        duration: 30,
+        deadline: '2024-02-15',
+        totalMarks: 100,
+        subject: 'JavaScript',
+        grade: '12',
+        studentCount: 45,
+        createdAt: '2024-01-01'
     },
     {
         id: 2,
         title: 'Vue.js Essentials',
+        status: 'expired',  // Ensure these match the statusOptions values exactly
         description: 'Complete guide to Vue.js core concepts',
-        status: 'expired',
-        questionsCount: 15,
+        questionCount: 15,
         updatedAt: '2024-01-14',
-        timeLimit: 25
+        duration: 25,
+        deadline: '2024-02-14',
+        totalMarks: 80,
+        subject: 'Vue.js',
+        grade: '11',
+        studentCount: 30,
+        createdAt: '2024-01-02'
     },
     {
         id: 3,
         title: 'CSS Grid & Flexbox',
+        status: 'active',  // Ensure these match the statusOptions values exactly
         description: 'Modern CSS layout techniques',
-        status: 'active',
-        questionsCount: 25,
+        questionCount: 25,
         updatedAt: '2024-01-13',
-        timeLimit: 40
+        duration: 40,
+        deadline: '2024-02-13',
+        totalMarks: 90,
+        subject: 'CSS',
+        grade: '10',
+        studentCount: 50,
+        createdAt: '2024-01-03'
     },
     {
         id: 4,
         title: 'React Basics',
+        status: 'completed',  // Ensure these match the statusOptions values exactly
         description: 'Introduction to React framework',
-        status: 'completed',
-        questionsCount: 30,
+        questionCount: 30,
         updatedAt: '2024-01-12',
-        timeLimit: 45
+        duration: 45,
+        deadline: '2024-02-12',
+        totalMarks: 95,
+        subject: 'React',
+        grade: '12',
+        studentCount: 40,
+        createdAt: '2024-01-04'
     },
     {
         id: 5,
         title: 'TypeScript Advanced',
+        status: 'expired',  // Ensure these match the statusOptions values exactly
         description: 'Advanced concepts in TypeScript',
-        status: 'expired',
-        questionsCount: 18,
+        questionCount: 18,
         updatedAt: '2024-01-11',
-        timeLimit: 35
+        duration: 35,
+        deadline: '2024-02-11',
+        totalMarks: 85,
+        subject: 'TypeScript',
+        grade: '11',
+        studentCount: 35,
+        createdAt: '2024-01-05'
     }
 ]);
 

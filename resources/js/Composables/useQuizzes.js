@@ -1,13 +1,12 @@
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 
 export function useQuizzes() {
     const searchQuery = ref('');
-    const sortBy = ref('newest');
-    const selectedStatus = ref(null);
+    const selectedGrade = ref('');
     const loading = ref(false);
 
     const statusOptions = [
-        { label: 'All Status', value: null },
+        { label: 'All', value: null },
         { label: 'Active', value: 'active' },
         { label: 'Completed', value: 'completed' },
         { label: 'Expired', value: 'expired' }
@@ -20,6 +19,10 @@ export function useQuizzes() {
         { label: 'Deadline: Farthest', value: 'deadline-desc' }
     ];
 
+    // Initialize with default values
+    const selectedStatus = ref(statusOptions[0]); // All
+    const sortBy = ref(sortOptions[0]); // Newest First
+
     const pagination = ref({
         first: 0,
         rows: 10,
@@ -29,28 +32,39 @@ export function useQuizzes() {
     const filterAndSortQuizzes = (quizzes) => {
         let filtered = [...quizzes];
 
-        if (searchQuery.value) {
-            filtered = filtered.filter(quiz =>
-                quiz.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                quiz.subject.toLowerCase().includes(searchQuery.value.toLowerCase())
+        if (searchQuery.value?.trim()) {
+            const query = searchQuery.value.toLowerCase();
+            filtered = filtered.filter(quiz => 
+                quiz.title.toLowerCase().includes(query) || 
+                quiz.description.toLowerCase().includes(query)
             );
         }
 
-        if (selectedStatus.value) {
-            filtered = filtered.filter(quiz => quiz.status === selectedStatus.value);
+        // Only apply status filter if not "All"
+        if (selectedStatus.value?.value !== null) {
+            filtered = filtered.filter(quiz => 
+                quiz.status.toLowerCase() === selectedStatus.value.value.toLowerCase()
+            );
         }
 
+        if (selectedGrade.value) {
+            filtered = filtered.filter(quiz => quiz.grade === selectedGrade.value);
+        }
+
+        // Apply sorting
         filtered.sort((a, b) => {
-            switch (sortBy.value) {
+            const sortValue = sortBy.value?.value || 'newest';
+            
+            switch (sortValue) {
                 case 'oldest':
-                    return new Date(a.createdAt) - new Date(b.createdAt);
+                    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
                 case 'deadline-asc':
-                    return new Date(a.deadline) - new Date(b.deadline);
+                    return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
                 case 'deadline-desc':
-                    return new Date(b.deadline) - new Date(a.deadline);
+                    return new Date(b.deadline).getTime() - new Date(a.deadline).getTime();
                 case 'newest':
                 default:
-                    return new Date(b.createdAt) - new Date(a.createdAt);
+                    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
             }
         });
 
@@ -59,16 +73,21 @@ export function useQuizzes() {
 
     const resetFilters = () => {
         searchQuery.value = '';
-        sortBy.value = 'newest';
-        selectedStatus.value = null;
-        pagination.value.page = 0;
-        pagination.value.first = 0;
+        sortBy.value = sortOptions[0];
+        selectedStatus.value = statusOptions[0];
+        selectedGrade.value = '';
+        pagination.value = {
+            first: 0,
+            rows: 10,
+            page: 0
+        };
     };
 
     return {
         searchQuery,
         sortBy,
         selectedStatus,
+        selectedGrade,
         loading,
         statusOptions,
         sortOptions,
