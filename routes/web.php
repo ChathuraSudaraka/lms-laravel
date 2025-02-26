@@ -16,12 +16,34 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return Inertia::render('Console/Dashboard');
     })->name('dashboard');
-    Route::get('/students', function () {
-        return Inertia::render('Console/Students');
-    })->name('students');
+
+    Route::prefix('students')->name('students.')->group(function () {
+        Route::get('/', function () {
+            return Inertia::render('Console/Students');
+        })->name('index');
+        
+        Route::get('/{id}', function ($id) {
+            // Mock student data for demonstration - replace with actual DB query
+            $student = collect([
+                'id' => $id,
+                'name' => 'John Doe',
+                'email' => 'john@example.com',
+                'grade' => '10',
+                'status' => 'Active',
+                'feeStatus' => 'paid',
+                'photoUrl' => 'https://ui-avatars.com/api/?name=John+Doe',
+            ]);
+            
+            return Inertia::render('Console/Students/Show', [
+                'student' => $student
+            ]);
+        })->name('show');  // This will be prefixed with 'console.students.'
+    });
+
     Route::get('/moderators', function () {
         return Inertia::render('Console/Moderators');
     })->name('moderators');
+
     Route::prefix('lessons')->name('lessons.')->group(function () {
         Route::get('/', function () {
             return Inertia::render('Console/Lessons/Show');

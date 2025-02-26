@@ -7,6 +7,7 @@ import VueApexCharts from 'vue3-apexcharts'
 import 'primeicons/primeicons.css'
 import Tooltip from 'primevue/tooltip'
 import ToastService from 'primevue/toastservice'
+import ConfirmationService from 'primevue/confirmationservice'
 
 import { createPinia } from 'pinia'
 
@@ -40,7 +41,8 @@ createInertiaApp({
                 }, 
                 ripple: true 
             })
-            .use(ToastService) // Add this line
+            .use(ToastService)
+            .use(ConfirmationService)
             .directive('tooltip', Tooltip)
             .mount(el);
         return app;

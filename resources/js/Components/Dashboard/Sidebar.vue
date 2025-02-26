@@ -131,7 +131,7 @@ const mainMenuItems = [
   {
     label: 'Students',
     icon: 'pi-users',
-    route: route('console.students'),
+    route: route('console.students.index'),
     allowedRoles: ['admin', 'moderator']
   },
   {
