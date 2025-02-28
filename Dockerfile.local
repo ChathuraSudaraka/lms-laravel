@@ -55,10 +55,17 @@ RUN npm ci
 # Now copy the rest of the application
 COPY --chown=dev:www-data . .
 
-# Generate the autoloader and clear cache
+# Create SQLite database
+RUN touch database/database.sqlite && \
+    chmod 775 database/database.sqlite
+
+# Generate the autoloader and prepare the application
 RUN composer dump-autoload && \
+    cp .env.example .env && \
+    php artisan key:generate && \
     php artisan config:clear && \
-    php artisan cache:clear
+    php artisan cache:clear && \
+    php artisan migrate --force
 
 EXPOSE 8000
 
