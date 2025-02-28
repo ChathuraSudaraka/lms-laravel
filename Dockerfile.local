@@ -44,17 +44,7 @@ RUN mkdir -p /var/www/html/storage/framework/{sessions,views,cache} \
 # Switch to non-root user
 USER dev
 
-# Copy dependency files first
-COPY --chown=dev:www-data composer.json composer.lock ./
-COPY --chown=dev:www-data package.json package-lock.json* ./
-
-# Install PHP dependencies
-RUN composer install --no-scripts --no-autoloader
-
-# Install Node dependencies
-RUN npm ci
-
-# Now copy the rest of the application
+# Copy entire application
 COPY --chown=dev:www-data . .
 
 # Create .env file with necessary configurations
@@ -74,13 +64,15 @@ REDIS_PASSWORD=null\n\
 REDIS_PORT=6379\n\
 VITE_APP_URL=http://localhost:5173" > .env
 
-RUN php artisan migrate --force
-
-# Setup the application
-RUN composer dump-autoload && \
+# Install dependencies and setup application
+RUN composer install && \
+    touch database/database.sqlite && \
+    chmod 775 database/database.sqlite && \
+    php artisan migrate --force \
     php artisan key:generate && \
     php artisan config:clear && \
     php artisan cache:clear && \
+    npm install && \
 
 EXPOSE 8000
 
