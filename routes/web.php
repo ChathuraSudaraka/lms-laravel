@@ -76,4 +76,19 @@ Route::middleware([
             return Inertia::render('Console/Quizzes/Edit');
         })->name('edit');
     });
+
+    // Class Management Routes
+    Route::prefix('/classes')->name('classes.')->group(function () {
+        Route::get('/', function () {
+            return Inertia::render('Console/Classes/Show');
+        })->name('index');
+        
+        Route::get('/new', function () {
+            return Inertia::render('Console/Classes/New');
+        })->name('new');
+        
+        Route::get('/{id}', function () {
+            return Inertia::render('Console/Classes/Single');
+        })->name('view');
+    });
 });

@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # PHP Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    container_name: lms-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+      - ./storage:/var/www/html/storage
+    networks:
+      - lms-network
+    depends_on:
+      - redis
+
+  # Nginx Service
+  nginx:
+    image: nginx:alpine
+    container_name: lms-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - lms-network
+    depends_on:
+      - app
+
+  # Redis Service
+  redis:
+    image: redis:alpine
+    container_name: lms-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - lms-network
+
+  # Node Service for Frontend Development
+  node:
+    image: node:18-alpine
+    container_name: lms-node
+    volumes:
+      - .:/var/www/html
+    working_dir: /var/www/html
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "5173:5173"
+    networks:
+      - lms-network
+
+networks:
+  lms-network:
+    driver: bridge

@@ -144,6 +144,12 @@ const mainMenuItems = [
 
 const managementItems = [
   {
+    label: 'Classes',
+    icon: 'pi-users',
+    route: route('console.classes.index'),
+    allowedRoles: ['admin']
+  },
+  {
     label: 'Lessons',
     icon: 'pi-book',
     route: route('console.lessons.index'),
@@ -159,7 +165,7 @@ const managementItems = [
     label: 'Products',
     icon: 'pi-box',
     route: route('console.products'),
-    allowedRoles: ['admin', , 'student']
+    allowedRoles: ['admin', 'student']
   }
 ]
 
