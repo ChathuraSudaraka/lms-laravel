@@ -1,0 +1,18 @@
+node_modules
+vendor
+.git
+.env
+.env.*
+*.log
+storage/*.key
+bootstrap/cache/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
+
+# Allow these files to be copied during build
+!composer.json
+!composer.lock
+!package.json
+!package-lock.json

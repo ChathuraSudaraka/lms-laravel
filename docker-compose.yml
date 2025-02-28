@@ -12,25 +12,43 @@ services:
     volumes:
       - .:/var/www/html
       - ./storage:/var/www/html/storage
+      - ./bootstrap/cache:/var/www/html/bootstrap/cache
+    ports:
+      - "8000:8000"
     networks:
       - lms-network
     depends_on:
       - redis
+    environment:
+      - APP_ENV=local
+      - VITE_APP_URL=http://localhost:5173
+      - REDIS_HOST=redis
+    healthcheck:
+      test: ["CMD", "php", "artisan", "config:clear"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # Nginx Service
-  nginx:
-    image: nginx:alpine
-    container_name: lms-nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
+  # Vite Development Server
+  vite:
+    image: node:18-alpine
+    container_name: lms-vite
     volumes:
       - .:/var/www/html
-      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    working_dir: /var/www/html
+    ports:
+      - "5173:5173"
     networks:
       - lms-network
-    depends_on:
-      - app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # Redis Service
   redis:
@@ -41,19 +59,11 @@ services:
       - "6379:6379"
     networks:
       - lms-network
-
-  # Node Service for Frontend Development
-  node:
-    image: node:18-alpine
-    container_name: lms-node
-    volumes:
-      - .:/var/www/html
-    working_dir: /var/www/html
-    command: sh -c "npm install && npm run dev"
-    ports:
-      - "5173:5173"
-    networks:
-      - lms-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
   lms-network:

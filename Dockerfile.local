@@ -14,7 +14,8 @@ RUN apt-get update && apt-get install -y \
     unzip \
     nodejs \
     npm \
-    sqlite3
+    sqlite3 \
+    libsqlite3-dev
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -30,21 +31,35 @@ RUN useradd -G www-data,root -u 1000 -d /home/dev dev
 RUN mkdir -p /home/dev/.composer && \
     chown -R dev:dev /home/dev
 
-# Set proper permissions
-RUN chown -R dev:dev /var/www/html
+# Create Laravel required directories and set permissions
+RUN mkdir -p /var/www/html/storage/framework/{sessions,views,cache} \
+    && mkdir -p /var/www/html/storage/logs \
+    && mkdir -p /var/www/html/bootstrap/cache \
+    && chown -R dev:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache
 
 # Switch to non-root user
 USER dev
 
-# Copy project files
-COPY --chown=dev:dev . .
+# Copy dependency files first
+COPY --chown=dev:www-data composer.json composer.lock ./
+COPY --chown=dev:www-data package.json package-lock.json* ./
 
-# Install dependencies
-RUN composer install
-RUN npm install
+# Install PHP dependencies
+RUN composer install --no-scripts --no-autoloader
 
-# Expose port 9000 for PHP-FPM
-EXPOSE 9000
+# Install Node dependencies
+RUN npm ci
 
-# Start PHP-FPM
-CMD ["php-fpm"]
+# Now copy the rest of the application
+COPY --chown=dev:www-data . .
+
+# Generate the autoloader and clear cache
+RUN composer dump-autoload && \
+    php artisan config:clear && \
+    php artisan cache:clear
+
+EXPOSE 8000
+
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
