@@ -74,6 +74,8 @@ REDIS_PASSWORD=null\n\
 REDIS_PORT=6379\n\
 VITE_APP_URL=http://localhost:5173" > .env
 
+RUN php artisan migrate --force
+
 # Setup the application
 RUN touch database/database.sqlite && \
     chmod 775 database/database.sqlite && \
@@ -81,7 +83,6 @@ RUN touch database/database.sqlite && \
     php artisan key:generate && \
     php artisan config:clear && \
     php artisan cache:clear && \
-    php artisan migrate --force
 
 EXPOSE 8000
 
