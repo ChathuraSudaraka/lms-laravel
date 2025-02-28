@@ -162,4 +162,12 @@ const submit = () => {
     border-radius: 0.5rem;
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 }
+
+/* Add specific styling for error messages */
+:deep(.p-error), .p-error {
+    color: #ef4444 !important; /* Using Tailwind's red-500 color */
+    font-weight: 500;
+    margin-top: 0.25rem;
+    display: block;
+}
 </style>

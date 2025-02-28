@@ -129,4 +129,12 @@ const submit = () => {
 :deep(.p-inputgroup-addon) {
     background-color: transparent;
 }
+
+/* Add specific styling for error messages */
+:deep(.p-error), .p-error {
+    color: #ef4444 !important; /* Using Tailwind's red-500 color */
+    font-weight: 500;
+    margin-top: 0.25rem;
+    display: block;
+}
 </style>
