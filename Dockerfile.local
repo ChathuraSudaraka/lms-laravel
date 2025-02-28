@@ -77,9 +77,7 @@ VITE_APP_URL=http://localhost:5173" > .env
 RUN php artisan migrate --force
 
 # Setup the application
-RUN touch database/database.sqlite && \
-    chmod 775 database/database.sqlite && \
-    composer dump-autoload && \
+RUN composer dump-autoload && \
     php artisan key:generate && \
     php artisan config:clear && \
     php artisan cache:clear && \
