@@ -16,3 +16,4 @@ storage/logs/*
 !composer.lock
 !package.json
 !package-lock.json
+!.env.example
