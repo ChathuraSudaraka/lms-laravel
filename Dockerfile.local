@@ -47,7 +47,7 @@ USER dev
 # Copy entire application
 COPY --chown=dev:www-data . .
 
-# Create .env file with necessary configurations
+# Setup the application
 RUN echo "APP_NAME=LMS\n\
 APP_ENV=local\n\
 APP_DEBUG=true\n\
@@ -62,17 +62,15 @@ SESSION_LIFETIME=120\n\
 REDIS_HOST=redis\n\
 REDIS_PASSWORD=null\n\
 REDIS_PORT=6379\n\
-VITE_APP_URL=http://localhost:5173" > .env
-
-# Install dependencies and setup application
-RUN composer install && \
+VITE_APP_URL=http://localhost:5173" > .env && \
+    composer install && \
     touch database/database.sqlite && \
     chmod 775 database/database.sqlite && \
-    php artisan migrate --force \
     php artisan key:generate && \
     php artisan config:clear && \
     php artisan cache:clear && \
-    npm install && \
+    php artisan migrate --force && \
+    npm install
 
 EXPOSE 8000
 
