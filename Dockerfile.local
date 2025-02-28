@@ -47,6 +47,7 @@ USER dev
 # Copy dependency files first
 COPY --chown=dev:www-data composer.json composer.lock ./
 COPY --chown=dev:www-data package.json package-lock.json* ./
+COPY --chown=dev:www-data .env.example .env.example
 
 # Install PHP dependencies
 RUN composer install --no-scripts --no-autoloader
