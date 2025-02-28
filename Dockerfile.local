@@ -35,9 +35,11 @@ RUN mkdir -p /home/dev/.composer && \
 RUN mkdir -p /var/www/html/storage/framework/{sessions,views,cache} \
     && mkdir -p /var/www/html/storage/logs \
     && mkdir -p /var/www/html/bootstrap/cache \
+    && mkdir -p /var/www/html/database \
     && chown -R dev:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage \
-    && chmod -R 775 /var/www/html/bootstrap/cache
+    && chmod -R 775 /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/database
 
 # Switch to non-root user
 USER dev
@@ -55,12 +57,10 @@ RUN npm ci
 # Now copy the rest of the application
 COPY --chown=dev:www-data . .
 
-# Create SQLite database
+# Setup the application
 RUN touch database/database.sqlite && \
-    chmod 775 database/database.sqlite
-
-# Generate the autoloader and prepare the application
-RUN composer dump-autoload && \
+    chmod 775 database/database.sqlite && \
+    composer dump-autoload && \
     cp .env.example .env && \
     php artisan key:generate && \
     php artisan config:clear && \
